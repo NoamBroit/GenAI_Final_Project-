@@ -3,19 +3,14 @@
   <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Logo" width="120" height="120">
 </p>
 
-<h1 align="center">My Python Project</h1>
+<h1 align="center">GenAI Recruiter Bot</h1>
 
 <p align="center">
-  A feature-rich Python project<br>
-  <a href="#demo">View Demo</a>
-  ·
-  <a href="#demo">Report Bug</a>
-  ·
-  <a href="#demo">Request Feature</a>
+  An AI-powered SMS-style recruiter chatbot that screens Python Developer candidates,<br>
+  answers their questions, and schedules interviews — all through a Streamlit interface.
 </p>
 
 ---
-<br></br>
 
 ## Table of Contents
 
@@ -23,175 +18,216 @@
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
-- [Screenshots](#screenshots)
-- [Code Examples](#code-examples)
 - [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Evaluation](#evaluation)
 - [To-Do List](#to-do-list)
-- [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 - [Acknowledgments](#acknowledgments)
 
 ---
-<br></br>
-
 
 ## About The Project
 
-> This project demonstrates a simple...<br>
+This project is a Proof-of-Concept (PoC) for an AI-powered recruiter assistant.  
+The bot interacts with job candidates for a **Python Developer** position via a Streamlit chat interface (simulating SMS).
 
-<div style="background: #272822; color: #f8f8f2; padding: 10px; border-radius: 8px;">
-  <b> Technologies:</b> Python, Pandas, NumPy, Matplotlib, OpenAI API
+The system orchestrates three specialized AI agents:
+- **ExitAdvisor** — decides whether to end the conversation (fine-tuned on real labeled data)
+- **SchedulingAdvisor** — checks available interview slots from a SQL database and books them
+- **InfoAdvisor** — answers candidate questions using RAG (Retrieval-Augmented Generation) over the Job Description PDF via Chroma
+
+<div style="background: #1e1e2e; color: #cdd6f4; padding: 12px 16px; border-radius: 8px; margin-top: 8px;">
+  <b>Technologies:</b> Python · OpenAI API · LangChain · Streamlit · ChromaDB · SQLite · Fine-Tuning · RAG
 </div>
 
 ---
-<br></br>
-
 
 ## Features
 
-- [x] Data loading and cleaning  
-- [x] Data handaling with Pandas & NumPy 
-- [x] Streamlit
-- [x] LangChain
-- [x] Agent Orchestration
-- [x] Modern Python project structure  
-- [x] <span style="color: green; font-weight: bold;">Easy customization</span>  
-- [ ] Cloud deployment _(coming soon!)_  
+- [x] Multi-agent orchestration (Main Agent + 3 Advisors)
+- [x] ExitAdvisor fine-tuned on labeled conversation data
+- [x] RAG-based InfoAdvisor using ChromaDB + OpenAI Embeddings
+- [x] Interview scheduling with live availability from SQLite DB
+- [x] Streamlit chat UI with conversation state management
+- [x] Evaluation notebook with Accuracy, F1, and Confusion Matrix
+- [x] Externalized prompts (`.txt` files) for easy customization
+- [x] Swap job positions by replacing a single PDF file
+- [ ] Cloud deployment _(coming soon)_
 
 ---
-<br></br>
 
-
-##  Getting Started
-Explain how to get started with the project...
+## Getting Started
 
 ### Prerequisites
 
-- Python >= 3.8
+- Python >= 3.10
+- OpenAI API key
 - pip
 
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/python-project.git
-cd python-project
+git clone https://github.com/yourusername/GenAIfinalProject.git
+cd GenAIfinalProject
+
+python -m venv .venv-FinalProject
+source .venv-FinalProject/Scripts/activate   # Windows
+# or
+source .venv-FinalProject/bin/activate       # Mac/Linux
+
 pip install -r requirements.txt
 ```
 
----
-<br></br>
+### Environment Variables
 
+Create a `.env` file in the project root:
+
+```env
+OPENAI_API_KEY=sk-...
+EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-2024-07-18:personal::XXXXXXXX
+```
+
+### One-Time Setup
+
+**1. Initialize the database:**
+
+```bash
+python -c "from app.Services.db_service import DBService; DBService()"
+```
+
+**2. Embed the Job Description into Chroma:**
+
+```bash
+python embedding/embed_job_description.py
+```
+
+**3. (Optional) Run fine-tuning for ExitAdvisor:**
+
+```bash
+python fine_tuning/prepare_and_finetune.py
+```
+
+---
 
 ## Usage
 
-```python
-from python_project import pp
-
-result = pp.my_function()
-print(result)
-```
-
-### Or run the CLI:
+### Run the Streamlit app:
 
 ```bash
-python main.py
+streamlit run streamlit_app/streamlit_main.py
 ```
 
----
-<br></br>
+### Run via CLI:
 
-
-## Screenshots
-
-<p float="left">
-  <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/e50214173218977.648c4882a75d6.gif"  width="400"/>
-</p>
-
----
-<br></br>
-
-
-## Code Examples
-
-```python
-import pandas as pd
-from openai import OpenAI
-
-client = OpenAI(api_key="your_api_key_here") # Replace with your actual API key or use environment variable
-
-# Load data
-df = pd.read_csv('data/dataset.csv')
-
+```bash
+python app/main.py
 ```
 
----
-<br></br>
+### Run evaluation notebook:
 
+Open `test_evals.ipynb` in VS Code or Jupyter and run all cells.
+
+---
 
 ## Project Structure
 
 ```text
-python-project/
-├── data/
-│   └── dataset.csv
-├── python_project/
-│   ├── __init__.py
-│   └── python_project.py
-├── tests/
-│   └── test.py
-├── main.py
+GenAIfinalProject/
+├── Advisors/
+│   ├── ExitAdvisor/
+│   │   ├── ExitAdvisor.py
+│   │   └── exit_advisor_prompt.txt
+│   ├── InfoAdvisor/
+│   │   ├── InfoAdvisor.py
+│   │   └── info_advisor_prompt.txt
+│   └── SchedulingAdvisor/
+│       ├── SchedulingAdvisor.py
+│       └── scheduling_advisor_prompt.txt
+├── app/
+│   ├── agents/
+│   │   └── main_agent.py
+│   ├── Services/
+│   │   ├── db_service.py
+│   │   ├── llm_service.py
+│   │   ├── pdf_service.py
+│   │   └── chroma_service.py
+│   └── main.py
+├── embedding/
+│   ├── embed_job_description.py
+│   └── chroma_db/               ← generated after running embed script
+├── fine_tuning/
+│   ├── prepare_and_finetune.py
+│   └── exit_advisor_train.jsonl ← generated after running fine-tune script
+├── streamlit_app/
+│   └── streamlit_main.py
+├── .env
+├── .gitignore
+├── db_Tech.sql
+├── tech.db
 ├── requirements.txt
-└── README.md
+├── sms_conversations.json
+├── PythonDeveloperJobDescription.pdf
+└── test_evals.ipynb
 ```
 
 ---
-<br></br>
 
+## Architecture
+
+```
+User (Streamlit)
+      │
+      ▼
+  MainAgent
+  ├── ExitAdvisor        → Fine-tuned gpt-4o-mini  → End / Continue
+  ├── SchedulingAdvisor  → gpt-4o-mini + SQLite DB  → Schedule / Confirm / None
+  └── InfoAdvisor        → gpt-4o-mini + ChromaDB   → Continue conversation
+```
+
+**Decision flow per message:**
+
+1. `ExitAdvisor` — should we end the conversation?
+2. `SchedulingAdvisor` — is the candidate ready to schedule?
+3. `InfoAdvisor` — continue gathering info / answer questions
+
+---
+
+## Evaluation
+
+The `test_evals.ipynb` notebook evaluates the `ExitAdvisor` against the labeled dataset (`sms_conversations.json`).
+
+**Metrics:** Accuracy · Precision · Recall · F1 · Confusion Matrix
+
+To run:
+```bash
+jupyter notebook test_evals.ipynb
+```
+
+---
 
 ## To-Do List
 
-- [x] Initial project setup
-- [x] Add python_project module
-- [ ] Improve documentation
-- [ ] Add web interface
-
-
----
-<br></br>
-
-
-## Contributing
-
-Contributions are **welcome**! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+- [x] Multi-agent architecture
+- [x] Fine-tuning pipeline
+- [x] RAG with ChromaDB
+- [x] Evaluation notebook
+- [ ] Cloud deployment to Streamlit Community Cloud
+- [ ] Add more job positions
 
 ---
-<br></br>
-
-
-
-## License
-
-Distributed under the XXX License. See `LICENSE` for more information.
-
----
-<br></br>
-
 
 ## Contact
 
-**Your Name** - [@yourtmail@gmail.com](yourmail@gmail.com)  
-Project Link: [https://github.com/yourusername/python-project](https://github.com/yourusername/python-project)
+**Noam** — [your email here]  
+Project Link: [https://github.com/yourusername/GenAIfinalProject](https://github.com/yourusername/GenAIfinalProject)
 
 ---
-<br></br>
-
 
 ## Acknowledgments
 
+- [OpenAI](https://platform.openai.com/)
+- [Streamlit](https://streamlit.io/)
+- [ChromaDB](https://www.trychroma.com/)
+- [LangChain](https://www.langchain.com/)
 - [Python](https://www.python.org/)
-- [Pandas](https://pandas.pydata.org/)
-- [OpenAI API](https://platform.openai.com/docs/overview)
-
-
----
