@@ -1,13 +1,4 @@
 # fine_tuning/prepare_and_finetune.py
-#
-# Run this script ONCE to:
-#   1. Prepare the JSONL training file from sms_conversations.json
-#   2. Upload it to OpenAI
-#   3. Launch the fine-tuning job
-#   4. Print the resulting model ID to use in ExitAdvisor
-#
-# Usage:
-#   python fine_tuning/prepare_and_finetune.py
 
 import os
 import json
@@ -19,13 +10,11 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# ── Paths ───────────────────────────────────────────────────────────────────
 BASE_DIR        = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONVERSATIONS   = os.path.join(BASE_DIR, "sms_conversations.json")
 PDF_PATH        = os.path.join(BASE_DIR, "PythonDeveloperJobDescription.pdf")
 OUTPUT_JSONL    = os.path.join(BASE_DIR, "fine_tuning", "exit_advisor_train.jsonl")
 
-# ── System prompt ────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = (
     "You are a recruiter assistant deciding whether to END a conversation with a job candidate. "
     "Reply with exactly one word: 'True' to end the conversation, or 'False' to continue. "
@@ -34,7 +23,6 @@ SYSTEM_PROMPT = (
 )
 
 
-# ── Step 1: Build JSONL ──────────────────────────────────────────────────────
 def build_jsonl(conversations_path, output_path):
     with open(conversations_path, "r", encoding="utf-8") as f:
         conversations = json.load(f)
@@ -48,7 +36,6 @@ def build_jsonl(conversations_path, output_path):
         for i, turn in enumerate(turns):
             if turn["speaker"] == "recruiter" and turn.get("label"):
 
-                # Find last candidate message
                 candidate_msg = ""
                 for prev in reversed(turns[:i]):
                     if prev["speaker"] == "candidate":
@@ -60,7 +47,6 @@ def build_jsonl(conversations_path, output_path):
 
                 label = "True" if turn["label"] == "end" else "False"
 
-                # Build user content: history + latest message
                 history_text = "\n".join(history_lines) if history_lines else "(no prior turns)"
                 user_content = (
                     f"CONVERSATION HISTORY:\n{history_text}\n\n"
@@ -76,7 +62,6 @@ def build_jsonl(conversations_path, output_path):
                     ]
                 })
 
-            # Update history
             if turn["speaker"] == "candidate":
                 history_lines.append(f"Candidate: {turn['text']}")
             elif turn["speaker"] == "recruiter":
@@ -91,7 +76,6 @@ def build_jsonl(conversations_path, output_path):
     return len(samples)
 
 
-# ── Step 2: Upload to OpenAI ─────────────────────────────────────────────────
 def upload_file(jsonl_path):
     with open(jsonl_path, "rb") as f:
         response = client.files.create(file=f, purpose="fine-tune")
@@ -100,7 +84,6 @@ def upload_file(jsonl_path):
     return file_id
 
 
-# ── Step 3: Launch fine-tuning job ───────────────────────────────────────────
 def launch_finetune(file_id):
     job = client.fine_tuning.jobs.create(
         training_file=file_id,
@@ -112,7 +95,6 @@ def launch_finetune(file_id):
     return job.id
 
 
-# ── Step 4: Poll until done ───────────────────────────────────────────────────
 def wait_for_completion(job_id):
     print("[4/4] Waiting for fine-tune to complete (this may take 10-30 minutes)...")
     while True:
@@ -134,7 +116,6 @@ def wait_for_completion(job_id):
         time.sleep(60)
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     build_jsonl(CONVERSATIONS, OUTPUT_JSONL)
     file_id  = upload_file(OUTPUT_JSONL)
