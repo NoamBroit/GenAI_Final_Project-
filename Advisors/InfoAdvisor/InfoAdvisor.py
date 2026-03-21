@@ -1,38 +1,44 @@
 # app/Advisors/InfoAdvisor/InfoAdvisor.py
 
+import os
 from app.Services.llm_service import LLMService
+from app.Services.chroma_service import ChromaService
+
 
 class InfoAdvisor:
-    def __init__(self, job_description):
-        from app.Services.llm_service import LLMService
-        self.llm = LLMService()
-        self.job_description = job_description
 
-    def generate_response(self, history, message):
-        prompt = f"""
-        You are a recruiter assistant. 
-        Use the following Job Description to screen the candidate:
-        ---
-        {self.job_description}
-        ---
-        Based on the history and the requirements above, continue the conversation.
-        History: {history}
-        User message: {message}
-        """
-        return self.llm.generate(prompt)
-    
-    def ending_llm_response(self, history, message):
-        prompt = f"""
-        You are a recruiter assistant. 
-        you should decide if it's time to end the convestation and reject the candidate.
-        if you decide to reject the candidate, or the candidate expresses disinterest, you replay "True".
-        you cannot reply anything else but "True" or "False"
-        ---
-        {self.job_description}
-        ---
-        Based on the history and the requirements above, decside if ending the conversation is appropriate. 
-        History: {history}
-        User message: {message}
-        """
+    def __init__(self, job_description: str):
+        self.llm    = LLMService()
+        self.chroma = ChromaService()
+
+        prompt_path = os.path.join(os.path.dirname(__file__), "info_advisor_prompt.txt")
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            self.prompt_template = f.read()
+
+    def generate_response(self, history: list, message: str) -> str:
+        # Retrieve the most relevant chunks from Chroma
+        context = self.chroma.query(message, n_results=3)
+
+        prompt = self.prompt_template.format(
+            context=context,
+            history=self._format_history(history),
+            message=message
+        )
+
         return self.llm.generate(prompt)
 
+    def _format_history(self, history: list) -> str:
+        if not history:
+            return "(no prior turns)"
+        lines = []
+        for turn in history:
+            if isinstance(turn, dict):
+                user = turn.get("user", "")
+                bot  = turn.get("bot", "")
+                if user:
+                    lines.append(f"Candidate: {user}")
+                if bot:
+                    lines.append(f"Recruiter: {bot}")
+            else:
+                lines.append(str(turn))
+        return "\n".join(lines)
