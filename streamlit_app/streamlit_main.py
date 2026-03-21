@@ -12,7 +12,6 @@ from app.agents.main_agent import MainAgent
 
 st.title("Python Developer Opportunity Recruiter")
 
-# ── Session state init ──────────────────────────────────────────────────────
 if "agent" not in st.session_state:
     st.session_state.agent = MainAgent()
 
@@ -28,19 +27,16 @@ if "scheduling_in_progress" not in st.session_state:
 if "interview_confirmed" not in st.session_state:
     st.session_state.interview_confirmed = False
 
-# ── Render chat history ─────────────────────────────────────────────────────
 for user, bot in st.session_state.history:
     with st.chat_message("user"):
         st.write(user)
     with st.chat_message("assistant"):
         st.write(bot)
 
-# ── Conversation ended state ────────────────────────────────────────────────
 if st.session_state.conversation_ended:
     st.error("This conversation has ended.")
     st.chat_input("Conversation ended", disabled=True)
 
-# ── Active conversation ─────────────────────────────────────────────────────
 else:
     if prompt := st.chat_input("Type your message here..."):
 
@@ -59,11 +55,9 @@ else:
             st.session_state.interview_confirmed = False
 
         elif result["action"] == "schedule":
-            # Slots offered — protect next turn from ExitAdvisor
             st.session_state.scheduling_in_progress = True
 
         elif result["action"] == "confirmed":
-            # Interview locked in — stay in confirmed state permanently
             st.session_state.scheduling_in_progress = False
             st.session_state.interview_confirmed = True
 
