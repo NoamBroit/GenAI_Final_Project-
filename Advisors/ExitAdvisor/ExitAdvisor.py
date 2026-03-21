@@ -6,9 +6,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── After fine-tuning, replace this with your fine-tuned model ID ────────────
-# Example: "ft:gpt-4o-mini-2024-07-18:my-org::ABC123"
-#FINE_TUNED_MODEL = os.getenv("EXIT_ADVISOR_MODEL", "gpt-4o-mini")
 
 FINE_TUNED_MODEL = "ft:gpt-4o-mini-2024-07-18:personal::DLnxtr15"
 
