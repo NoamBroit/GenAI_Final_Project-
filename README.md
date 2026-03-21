@@ -7,7 +7,7 @@
 
 <p align="center">
   An AI-powered SMS-style recruiter chatbot that screens Python Developer candidates,<br>
-  answers their questions, and schedules interviews — all through a Streamlit interface.
+  answers their questions, and schedules interviews through a Streamlit interface.
 </p>
 
 ---
@@ -29,13 +29,13 @@
 
 ## About The Project
 
-This project is a Proof-of-Concept (PoC) for an AI-powered recruiter assistant.  
+This project is a Proof-of-Concept for an AI-powered recruiter assistant as part of **Generative AI** course by the Technion.  
 The bot interacts with job candidates for a **Python Developer** position via a Streamlit chat interface (simulating SMS).
 
 The system orchestrates three specialized AI agents:
-- **ExitAdvisor** — decides whether to end the conversation (fine-tuned on real labeled data)
-- **SchedulingAdvisor** — checks available interview slots from a SQL database and books them
-- **InfoAdvisor** — answers candidate questions using RAG (Retrieval-Augmented Generation) over the Job Description PDF via Chroma
+- **Exit Advisor** - decides whether to end the conversation (fine-tuned on real labeled data)
+- **Scheduling Advisor** - checks available interview slots from a SQL database and books them
+- **Information Advisor** - generates quastions and answers to communicate with the candidate
 
 <div style="background: #1e1e2e; color: #cdd6f4; padding: 12px 16px; border-radius: 8px; margin-top: 8px;">
   <b>Technologies:</b> Python · OpenAI API · LangChain · Streamlit · ChromaDB · SQLite · Fine-Tuning · RAG
@@ -46,8 +46,8 @@ The system orchestrates three specialized AI agents:
 ## Features
 
 - [x] Multi-agent orchestration (Main Agent + 3 Advisors)
-- [x] ExitAdvisor fine-tuned on labeled conversation data
-- [x] RAG-based InfoAdvisor using ChromaDB + OpenAI Embeddings
+- [x] Exit Advisor fine-tuned on labeled conversation data
+- [x] RAG-based Information Advisor using ChromaDB + OpenAI Embeddings
 - [x] Interview scheduling with live availability from SQLite DB
 - [x] Streamlit chat UI with conversation state management
 - [x] Evaluation notebook with Accuracy, F1, and Confusion Matrix
@@ -68,8 +68,8 @@ The system orchestrates three specialized AI agents:
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/GenAIfinalProject.git
-cd GenAIfinalProject
+git clone https://github.com/NoamBroit/GenAI_Final_Project-.git
+cd GenAI_Final_Project-
 
 python -m venv .venv-FinalProject
 source .venv-FinalProject/Scripts/activate   # Windows
@@ -85,7 +85,7 @@ Create a `.env` file in the project root:
 
 ```env
 OPENAI_API_KEY=sk-...
-EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-2024-07-18:personal::XXXXXXXX
+EXIT_ADVISOR_MODEL=ft:gpt-4o-mini-2024-07-18:personal::DLnxtr15
 ```
 
 ### One-Time Setup
@@ -103,6 +103,8 @@ python embedding/embed_job_description.py
 ```
 
 **3. (Optional) Run fine-tuning for ExitAdvisor:**
+
+to be noted that this package already fine tuned. however, a fine tuning script is part of this package for optional use.
 
 ```bash
 python fine_tuning/prepare_and_finetune.py
@@ -155,12 +157,7 @@ GenAIfinalProject/
 │   └── main.py
 ├── embedding/
 │   ├── embed_job_description.py
-│   └── chroma_db/               ← generated after running embed script
-├── fine_tuning/
-│   ├── prepare_and_finetune.py
-│   └── exit_advisor_train.jsonl ← generated after running fine-tune script
-├── streamlit_app/
-│   └── streamlit_main.py
+│   └── chroma_db/               ← 
 ├── .env
 ├── .gitignore
 ├── db_Tech.sql
@@ -206,21 +203,12 @@ jupyter notebook test_evals.ipynb
 
 ---
 
-## To-Do List
-
-- [x] Multi-agent architecture
-- [x] Fine-tuning pipeline
-- [x] RAG with ChromaDB
-- [x] Evaluation notebook
-- [ ] Cloud deployment to Streamlit Community Cloud
-- [ ] Add more job positions
-
----
 
 ## Contact
 
-**Noam** — [your email here]  
-Project Link: [https://github.com/yourusername/GenAIfinalProject](https://github.com/yourusername/GenAIfinalProject)
+**Noam Broitman** — [noambro@gmail.com](mailto:noambro@gmail.com)
+
+Project Link: [https://github.com/NoamBroit/GenAI_Final_Project-](https://github.com/NoamBroit/GenAI_Final_Project-)
 
 ---
 
