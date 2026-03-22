@@ -27,13 +27,22 @@ class ChromaService:
 
     def query(self, question: str, n_results: int = 3) -> str:
         """
-        Query the vector store and return the most relevant chunks
-        as a single string, ready to inject into a prompt.
+        Return the most relevant chunks for a given question.
+        Used by InfoAdvisor for dynamic retrieval.
         """
         results = self.collection.query(
             query_texts=[question],
             n_results=n_results
         )
-
         chunks = results.get("documents", [[]])[0]
+        return "\n\n".join(chunks)
+
+    def get_full_document(self) -> str:
+        """
+        Return all chunks from the collection as a single string.
+        Used by ExitAdvisor and SchedulingAdvisor to understand
+        the full job description.
+        """
+        results = self.collection.get()
+        chunks  = results.get("documents", [])
         return "\n\n".join(chunks)

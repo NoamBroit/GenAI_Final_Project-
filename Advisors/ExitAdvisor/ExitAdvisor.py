@@ -3,11 +3,11 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
+from app.Services.chroma_service import ChromaService
 
 load_dotenv()
 
-
-FINE_TUNED_MODEL = "ft:gpt-4o-mini-2024-07-18:personal::DLnxtr15"
+FINE_TUNED_MODEL = os.getenv("EXIT_ADVISOR_MODEL", "gpt-4o-mini")
 
 SYSTEM_PROMPT = (
     "You are a recruiter assistant deciding whether to END a conversation with a job candidate. "
@@ -19,10 +19,13 @@ SYSTEM_PROMPT = (
 
 class ExitAdvisor:
 
-    def __init__(self, job_description: str):
+    def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.job_description = job_description
-        self.model = FINE_TUNED_MODEL
+        self.model  = FINE_TUNED_MODEL
+
+        # Load full job description once at startup
+        chroma = ChromaService()
+        self.job_description = chroma.get_full_document()
 
         prompt_path = os.path.join(os.path.dirname(__file__), "exit_advisor_prompt.txt")
         with open(prompt_path, "r", encoding="utf-8") as f:

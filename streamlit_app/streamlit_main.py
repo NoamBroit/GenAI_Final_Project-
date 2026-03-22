@@ -11,6 +11,7 @@ load_dotenv()
 from app.agents.main_agent import MainAgent
 
 st.title("Python Developer Opportunity Recruiter")
+st.write(st.session_state)                              #remove after debug
 
 if "agent" not in st.session_state:
     st.session_state.agent = MainAgent()
@@ -26,6 +27,18 @@ if "scheduling_in_progress" not in st.session_state:
 
 if "interview_confirmed" not in st.session_state:
     st.session_state.interview_confirmed = False
+
+# ── DEBUG: הצג את ה-action האחרון ──────────────────────────────────────────
+if "last_action" in st.session_state:
+    st.caption(f"🛠 DEBUG — last action: {st.session_state.last_action} | "  #remove after debug
+               f"scheduling_in_progress: {st.session_state.scheduling_in_progress} | "  #remove after debug
+               f"interview_confirmed: {st.session_state.interview_confirmed}")  #remove after debug
+
+# ── DEBUG: הצג את ה-action האחרון ──────────────────────────────────────────
+if "last_action" in st.session_state:
+    st.caption(f"🛠 DEBUG — last action: {st.session_state.last_action} | "
+               f"scheduling_in_progress: {st.session_state.scheduling_in_progress} | "
+               f"interview_confirmed: {st.session_state.interview_confirmed}")    
 
 for user, bot in st.session_state.history:
     with st.chat_message("user"):
@@ -47,7 +60,12 @@ else:
             interview_confirmed=st.session_state.interview_confirmed
         )
 
-        st.session_state.history.append((prompt, result["response"]))
+                # ── DEBUG: שמור את ה-action לפני rerun ──────────────────────────
+        st.session_state.last_action = result["action"]
+        st.session_state.history.append((prompt, result["response"])) #remove after debug
+
+       
+        #st.session_state.history.append((prompt, result["response"]))
 
         if result["action"] == "end":
             st.session_state.conversation_ended = True
@@ -62,6 +80,8 @@ else:
             st.session_state.interview_confirmed = True
 
         elif result["action"] == "continue":
-            st.session_state.scheduling_in_progress = False
+            if not st.session_state.scheduling_in_progress:
+                st.session_state.scheduling_in_progress = False
+            #st.session_state.scheduling_in_progress = False
 
         st.rerun()

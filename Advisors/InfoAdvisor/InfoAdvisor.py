@@ -7,7 +7,7 @@ from app.Services.chroma_service import ChromaService
 
 class InfoAdvisor:
 
-    def __init__(self, job_description: str):
+    def __init__(self):
         self.llm    = LLMService()
         self.chroma = ChromaService()
 
@@ -16,7 +16,7 @@ class InfoAdvisor:
             self.prompt_template = f.read()
 
     def generate_response(self, history: list, message: str) -> str:
-        # Retrieve the most relevant chunks from Chroma
+        # Dynamically fetch the most relevant JD chunks per message
         context = self.chroma.query(message, n_results=3)
 
         prompt = self.prompt_template.format(

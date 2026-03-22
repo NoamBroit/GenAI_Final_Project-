@@ -4,21 +4,25 @@ import os
 import json
 from app.Services.db_service import DBService
 from app.Services.llm_service import LLMService
+from app.Services.chroma_service import ChromaService
 
 
 class SchedulingAdvisor:
 
-    def __init__(self, job_description: str):
-        self.db = DBService()
+    def __init__(self):
+        self.db  = DBService()
         self.llm = LLMService()
-        self.job_description = job_description
+
+        # Load full job description once at startup
+        chroma = ChromaService()
+        self.job_description = chroma.get_full_document()
 
         prompt_path = os.path.join(os.path.dirname(__file__), "scheduling_advisor_prompt.txt")
         with open(prompt_path, "r", encoding="utf-8") as f:
             self.prompt_template = f.read()
 
     def try_schedule(self, history: list, message: str) -> dict | None:
-        slots = self.db.get_available_slots(limit=3)
+        slots      = self.db.get_available_slots(limit=3)
         slots_text = self._format_slots(slots)
 
         prompt = self.prompt_template.format(
@@ -41,17 +45,14 @@ class SchedulingAdvisor:
             return None
 
         return {
-            "action": action,  # "confirmed" or "schedule"
+            "action": action,
             "response": result.get("response", "")
         }
 
     def _format_slots(self, slots: list[dict]) -> str:
         if not slots:
             return "No available slots at this time."
-        lines = []
-        for s in slots:
-            lines.append(f"- {s['date']} at {s['time']} ({s['position']})")
-        return "\n".join(lines)
+        return "\n".join([f"- {s['date']} at {s['time']} ({s['position']})" for s in slots])
 
     def _format_history(self, history: list) -> str:
         if not history:
@@ -60,7 +61,7 @@ class SchedulingAdvisor:
         for turn in history:
             if isinstance(turn, dict):
                 user = turn.get("user", "")
-                bot = turn.get("bot", "")
+                bot  = turn.get("bot", "")
                 if user:
                     lines.append(f"Candidate: {user}")
                 if bot:
