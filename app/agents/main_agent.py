@@ -15,14 +15,12 @@ class MainAgent:
     def handle_message(self, conversation_history, user_message,
                        scheduling_in_progress=False, interview_confirmed=False):
 
-        # Once interview is confirmed, only allow friendly wrap-up via InfoAdvisor
         if interview_confirmed:
             response = self.info_advisor.generate_response(
                 conversation_history, user_message
             )
             return {"action": "confirmed", "response": response}
 
-        # While slots are being negotiated, skip ExitAdvisor
         if not scheduling_in_progress:
             if self.exit_advisor.should_end(conversation_history, user_message):
                 return {

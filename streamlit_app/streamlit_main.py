@@ -38,7 +38,8 @@ if st.session_state.conversation_ended:
     st.chat_input("Conversation ended", disabled=True)
 
 else:
-    if prompt := st.chat_input("Type your message here..."):
+    prompt = st.chat_input("Type your message here...")
+    if prompt:
 
         result = st.session_state.agent.handle_message(
             st.session_state.history,
