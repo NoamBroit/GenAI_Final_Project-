@@ -23,7 +23,6 @@ class ExitAdvisor:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model  = FINE_TUNED_MODEL
 
-        # Load full job description once at startup
         chroma = ChromaService()
         self.job_description = chroma.get_full_document()
 
