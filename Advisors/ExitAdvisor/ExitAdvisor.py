@@ -31,7 +31,7 @@ class ExitAdvisor:
         with open(prompt_path, "r", encoding="utf-8") as f:
             self.prompt_template = f.read()
 
-    def should_end(self, history: list, message: str) -> bool:
+    def should_end(self, history: list, message: str) :
         user_content = self.prompt_template.format(
             job_description=self.job_description,
             history=self._format_history(history),
@@ -51,7 +51,8 @@ class ExitAdvisor:
         raw = response.choices[0].message.content.strip()
         return raw.lower().startswith("true")
 
-    def _format_history(self, history: list) -> str:
+
+    def _format_history(self, history) :
         if not history:
             return "(no prior turns)"
         lines = []

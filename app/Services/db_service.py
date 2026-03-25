@@ -2,7 +2,7 @@
 
 import os
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tech.db")
@@ -28,7 +28,7 @@ class DBService:
         """)
         self.conn.commit()
 
-    def get_available_slots(self, limit: int = 3) -> list[dict]:
+    def get_available_slots(self, limit: int = 3) : 
         """Return the next N available Python Dev slots from today onward."""
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -39,7 +39,7 @@ class DBService:
               AND position = 'Python Dev'
             ORDER BY date, time
             LIMIT ?
-        """, (date.today().isoformat(), limit))
+        """, ((date.today() + timedelta(days=1)).isoformat() , limit))
 
         return [
             {"date": row[0], "time": row[1], "position": row[2]}

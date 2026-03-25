@@ -13,7 +13,6 @@ class SchedulingAdvisor:
         self.db  = DBService()
         self.llm = LLMService()
 
-        # Load full job description once at startup
         chroma = ChromaService()
         self.job_description = chroma.get_full_document()
 
@@ -21,7 +20,7 @@ class SchedulingAdvisor:
         with open(prompt_path, "r", encoding="utf-8") as f:
             self.prompt_template = f.read()
 
-    def try_schedule(self, history: list, message: str) -> dict | None:
+    def try_schedule(self, history, message) :
         slots      = self.db.get_available_slots(limit=3)
         slots_text = self._format_slots(slots)
 
