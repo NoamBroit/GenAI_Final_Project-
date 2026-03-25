@@ -15,8 +15,7 @@ class InfoAdvisor:
         with open(prompt_path, "r", encoding="utf-8") as f:
             self.prompt_template = f.read()
 
-    def generate_response(self, history: list, message: str) -> str:
-        # Dynamically fetch the most relevant JD chunks per message
+    def generate_response(self, history, message) :
         context = self.chroma.query(message, n_results=3)
 
         prompt = self.prompt_template.format(
@@ -27,7 +26,7 @@ class InfoAdvisor:
 
         return self.llm.generate(prompt)
 
-    def _format_history(self, history: list) -> str:
+    def _format_history(self, history) :
         if not history:
             return "(no prior turns)"
         lines = []
