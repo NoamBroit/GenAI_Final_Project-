@@ -30,7 +30,8 @@ class ExitAdvisor:
         with open(prompt_path, "r", encoding="utf-8") as f:
             self.prompt_template = f.read()
 
-    def should_end(self, history: list, message: str) :
+    def should_end(self, history, message) :
+
         user_content = self.prompt_template.format(
             job_description=self.job_description,
             history=self._format_history(history),
