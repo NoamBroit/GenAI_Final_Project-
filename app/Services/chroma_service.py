@@ -25,7 +25,7 @@ class ChromaService:
             embedding_function=embedding_fn
         )
 
-    def query(self, question: str, n_results: int = 3) -> str:
+    def query(self, question: str, n_results: int = 3) :
         """
         Return the most relevant chunks for a given question.
         Used by InfoAdvisor for dynamic retrieval.
@@ -37,7 +37,7 @@ class ChromaService:
         chunks = results.get("documents", [[]])[0]
         return "\n\n".join(chunks)
 
-    def get_full_document(self) -> str:
+    def get_full_document(self) :
         """
         Return all chunks from the collection as a single string.
         Used by ExitAdvisor and SchedulingAdvisor to understand
