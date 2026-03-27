@@ -12,21 +12,7 @@ class DBService:
 
     def __init__(self):
         self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-        self._ensure_table()
 
-    def _ensure_table(self):
-        """Create the Schedule table if it doesn't exist."""
-        cursor = self.conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS Schedule (
-                ScheduleID INTEGER PRIMARY KEY AUTOINCREMENT,
-                date       TEXT NOT NULL,
-                time       TEXT NOT NULL,
-                position   TEXT NOT NULL,
-                available  INTEGER NOT NULL
-            )
-        """)
-        self.conn.commit()
 
     def get_available_slots(self, limit: int = 3) : 
         """Return the next N available Python Dev slots from today onward."""
@@ -46,7 +32,7 @@ class DBService:
             for row in cursor.fetchall()
         ]
 
-    def confirm_slot(self, slot_date: str, slot_time: str) -> bool:
+    def confirm_slot(self, slot_date: str, slot_time: str) :
         """Mark a slot as unavailable once confirmed."""
         cursor = self.conn.cursor()
         cursor.execute("""
