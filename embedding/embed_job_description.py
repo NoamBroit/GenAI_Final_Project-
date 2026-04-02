@@ -20,7 +20,7 @@ CHUNK_SIZE      = 300
 CHUNK_OVERLAP   = 50   
 
 
-def split_text(text: str, chunk_size: int, overlap: int) -> list[str]:
+def split_text(text: str, chunk_size: int, overlap: int) :
     """Split text into overlapping chunks."""
     chunks = []
     start = 0

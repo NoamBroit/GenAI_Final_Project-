@@ -120,12 +120,6 @@ python fine_tuning/prepare_and_finetune.py
 streamlit run streamlit_app/streamlit_main.py
 ```
 
-### Run via CLI:
-
-```bash
-python app/main.py
-```
-
 ### Run evaluation notebook:
 
 Open `test_evals.ipynb` in VS Code or Jupyter and run all cells.
